@@ -1,0 +1,50 @@
+####
+# ATTENTION:
+# Replace all occurrences of sandbox with your project's name.
+####
+
+# v3 syntax
+version: '3'
+
+# Named volumes
+volumes:
+# MySQL Data
+  odr-mysql-data:
+    driver: local
+
+services:
+  #MySQL (5.7)
+  mysql:
+    image: mysql:5.7
+    container_name: odr-mysql
+    volumes:
+      - odr-mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=odr
+      - MYSQL_DATABASE=odr
+      - MYSQL_USER=odr
+      - MYSQL_PASSWORD=odr
+
+  # PHP (with Nginx)
+  app:
+    image: ambientum/php:7.3-nginx
+    container_name: odr-api
+    volumes:
+      - .:/var/www/app
+    ports:
+      - "8080:8080"
+    links:
+      - mysql
+
+  # Laravel Queues
+  # queue:
+  #   image: ambientum/php:7.3
+  #   container_name: odr-queue
+  #   command: php artisan queue:work
+  #   volumes:
+  #     - .:/var/www/app
+  #   links:
+  #     - mysql
+  #     - cache
